@@ -24,8 +24,6 @@ if(!class_exists("DesignCompetition")) {
       $this->addContent = $devOptions['add_content'] == 'true';
       $this->commentAuthor = $devOptions['comment_author'] == 'true';
       $this->content = $devOptions['content'];
-      //$this->render('temp', array('name' => 'dane'));
-      //exit;
     }
 
     function render($template, $variables) {
@@ -41,6 +39,58 @@ if(!class_exists("DesignCompetition")) {
 
     function init() {
       $this->getAdminOptions();
+      $this->registerTypes();
+    }
+
+    function registerTypes() {
+
+      $competition_args = array(
+        'public' => true,
+        'query_var' => 'competition',
+        'rewrite' => true,
+        'supports' => array(
+          'title',
+          'thumbnail'
+        ),
+        'labels' => array(
+            'name' => 'Competitions',
+            'singular_name' => 'Competition',
+            'add_new' => 'Add New Competition',
+            'add_new_item' => 'Add New Competition',
+            'edit_item' => 'Edit Competition',
+            'new_item' => 'New Competition',
+            'view_item' => 'View Competition',
+            'search_items' => 'Search Competitions',
+            'not_found' => 'No Competitions Found',
+            'not_found_in_trash' => 'No Competitions Found In Trash'
+        ),
+      );
+
+      register_post_type('competiton', $competition_args );
+
+      $entry_args = array(
+        'public' => true,
+        'query_var' => 'Entry',
+        'rewrite' => true,
+        'supports' => array(
+          'title',
+          'thumbnail'
+        ),
+        'labels' => array(
+            'name' => 'Entries',
+            'singular_name' => 'Entry',
+            'add_new' => 'Add New Entry',
+            'add_new_item' => 'Add New Entry',
+            'edit_item' => 'Edit Entry',
+            'new_item' => 'New Entry',
+            'view_item' => 'View Entry',
+            'search_items' => 'Search Entrys',
+            'not_found' => 'No Entries Found',
+            'not_found_in_trash' => 'No Entries Found In Trash'
+        ),
+      );
+
+      register_post_type('entry', $entry_args );
     }
 
     function getAdminOptions() {
@@ -105,6 +155,10 @@ if(!class_exists("DesignCompetition")) {
       return $author;
     }
 
+    function testShortcode($attr, $content) {
+      return '<p>hello '. $attr['name'] . '</p>' . '<p>' . $content . '</p>';
+    }
+
   }
 }
 
@@ -126,11 +180,14 @@ if (!function_exists("DesignCompetition_ap")) {
 }
 if(isset($design_competition)) {
   //Actions
-  add_action('activate_design-competition/design-competition.php', array(&$design_competition, 'init'));
+  add_action('init', array(&$design_competition, 'init'));
+  //add_action('activate_design-competition/design-competition.php', array(&$design_competition, 'init'));
   add_action('wp_head', array(&$design_competition, 'addHeaderCode'), 1);
   add_action('admin_menu', 'DesignCompetition_ap');
   
   //Filters
   add_filter('the_content', array(&$design_competition, 'addContent'));
   add_filter('get_comment_author', array(&$design_competition, 'authorUpperCase'));
+
+  add_shortcode('danetest', array(&$design_competition, 'testShortcode'));
 }
